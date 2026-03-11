@@ -34,7 +34,6 @@ namespace MvcMovie.Controllers
 
             // Use LINQ to get list of years.
             IQueryable<string> yearQuery = from m in _context.Movie
-                                           orderby m.ReleaseDate.Year
                                            select m.ReleaseDate.Year.ToString();
 
             var movies = from m in _context.Movie
@@ -58,10 +57,13 @@ namespace MvcMovie.Controllers
                 }
             }
 
+            var yearsList = await yearQuery.Distinct().ToListAsync();
+            var sortedYearsList = yearsList.OrderBy(y => y).ToList();
+
             var movieGenreVM = new MovieGenreViewModel
             {
                 Genres = new SelectList(await genreQuery.Distinct().ToListAsync()),
-                Years = new SelectList(await yearQuery.Distinct().ToListAsync()),
+                Years = new SelectList(sortedYearsList),
                 Movies = await movies.ToListAsync()
             };
 
